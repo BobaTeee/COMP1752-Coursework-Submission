@@ -11,7 +11,7 @@ def load_library():
         with open(csv_path, 'r') as file:
             csv_reader = csv.DictReader(file)
             for row in csv_reader:
-                key = str(row['id']).zfill(2)  
+                key = str(row['id']).zfill(2)
                 library[key] = LibraryItem(
                     str(row['name'].strip()),
                     str(row['artist'].strip()),
@@ -23,11 +23,32 @@ def load_library():
         return False
     return True
 
+def save_library():
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(current_dir, 'trackplaylist.csv')
+    try:
+        with open(csv_path, 'w', newline='') as file:
+            fieldnames = ['id', 'name', 'artist', 'rating', 'playcount']
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            for key in sorted(library.keys(), key=int):
+                item = library[key]
+                writer.writerow({
+                    'id': key,
+                    'name': item.name,
+                    'artist': item.artist,
+                    'rating': item.rating,
+                    'playcount': item.play_count
+                })
+    except Exception as e:
+        print(f"Failed to save library: {e}")
+
+
 load_library()
 
 def list_all():
     output = ""
-    for key in sorted(library.keys(), key=int):  
+    for key in sorted(library.keys(), key=int):
         item = library[key]
         output += f"{key} {item.info()}\n"
     return output
